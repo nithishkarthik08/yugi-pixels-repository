@@ -10,7 +10,7 @@ function App() {
   const [weddingCards, setWeddingCards] = useState([])
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/cards')
+    fetch('https://yugi-pixels-repository.onrender.com/api/cards')
       .then(res => res.json())
       .then(data => setWeddingCards(data))
       .catch(() => setWeddingCards([]))
@@ -104,7 +104,7 @@ function App() {
             {weddingCards.map(card => (
               <div key={card.id} className="card">
                 <div className="card-image">
-                  <img src={card.image.startsWith('/uploads/') ? `http://localhost:5000${card.image}` : card.image} alt={card.title} />
+                  <img src={card.image.startsWith('/uploads/') ? `https://yugi-pixels-repository.onrender.com${card.image}` : card.image} alt={card.title} />
                   <div className="card-overlay">
                     <span className="category">{card.category}</span>
                   </div>

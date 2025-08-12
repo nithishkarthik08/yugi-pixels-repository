@@ -49,7 +49,7 @@ const AdminPanel = ({ cards, onAddCard, onRemoveCard, onUpdateCard, onBackToWebs
         id: Date.now(),
       }
       // Send to backend
-      const res = await fetch('http://localhost:5000/api/cards', {
+      const res = await fetch('https://yugi-pixels-repository.onrender.com/api/cards', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cardToAdd)
@@ -112,7 +112,7 @@ const AdminPanel = ({ cards, onAddCard, onRemoveCard, onUpdateCard, onBackToWebs
     // Remove from backend
     const updatedCards = cards.filter(card => card.id !== cardId)
     // Save updated list to backend
-    await fetch('http://localhost:5000/api/cards', {
+    await fetch('https://yugi-pixels-repository.onrender.com/api/cards', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedCards)
@@ -123,7 +123,7 @@ const AdminPanel = ({ cards, onAddCard, onRemoveCard, onUpdateCard, onBackToWebs
   // Fetch about info on admin login
   React.useEffect(() => {
     if (isLoggedIn) {
-      fetch('http://localhost:5000/api/about')
+      fetch('https://yugi-pixels-repository.onrender.com/api/about')
         .then(res => res.json())
         .then(data => {
           setAboutInfo(data)
@@ -142,7 +142,7 @@ const AdminPanel = ({ cards, onAddCard, onRemoveCard, onUpdateCard, onBackToWebs
     } else if (aboutForm.image) {
       formData.append('image', aboutForm.image)
     }
-    const res = await fetch('http://localhost:5000/api/about', {
+    const res = await fetch('https://yugi-pixels-repository.onrender.com/api/about', {
       method: 'POST',
       body: formData
     })
@@ -254,7 +254,7 @@ const AdminPanel = ({ cards, onAddCard, onRemoveCard, onUpdateCard, onBackToWebs
                   if (file) {
                     const formData = new FormData();
                     formData.append('image', file);
-                    const res = await fetch('http://localhost:5000/api/upload', {
+                    const res = await fetch('https://yugi-pixels-repository.onrender.com/api/upload', {
                       method: 'POST',
                       body: formData
                     });
@@ -314,7 +314,7 @@ const AdminPanel = ({ cards, onAddCard, onRemoveCard, onUpdateCard, onBackToWebs
                 }}
               />
               {aboutInfo.image && (
-                <img src={aboutInfo.image.startsWith('/uploads/') ? `http://localhost:5000${aboutInfo.image}` : aboutInfo.image} alt="About Preview" style={{maxWidth: '120px', marginTop: '1rem', borderRadius: '8px'}} />
+                <img src={aboutInfo.image && aboutInfo.image.startsWith('/uploads/') ? `https://yugi-pixels-repository.onrender.com${aboutInfo.image}` : aboutInfo.image} alt="About Preview" style={{maxWidth: '120px', marginTop: '1rem', borderRadius: '8px'}} />
               )}
             </div>
             <div className="form-actions">
