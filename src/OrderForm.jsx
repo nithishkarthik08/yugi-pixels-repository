@@ -8,7 +8,6 @@ const OrderForm = ({ card, onClose }) => {
     email: '',
     phone: '',
     address: '',
-    quantity: 1,
     specialRequests: ''
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -20,11 +19,6 @@ const OrderForm = ({ card, onClose }) => {
       ...prev,
       [name]: value
     }))
-  }
-
-  const calculateTotal = () => {
-    const price = parseInt(card.price.replace('₹', ''))
-    return price * customerData.quantity
   }
 
   const handleManualEmail = () => {
@@ -41,9 +35,7 @@ ORDER DETAILS:
 Card: ${card.title}
 Category: ${card.category}
 Description: ${card.description}
-Price per piece: ${card.price}
-Quantity: ${customerData.quantity}
-Total Amount: ₹${calculateTotal()}
+Price: ${card.price}
 Order Date: ${new Date().toLocaleDateString()}
 
 SPECIAL REQUESTS:
@@ -71,8 +63,7 @@ ${customerData.specialRequests || 'None'}
       cardTitle: card.title,
       cardCategory: card.category,
       cardPrice: card.price,
-      quantity: customerData.quantity,
-      totalAmount: `₹${calculateTotal()}`,
+      totalAmount: card.price,
       specialRequests: customerData.specialRequests,
       orderDate: new Date().toLocaleDateString()
     }
@@ -113,8 +104,8 @@ Card Design: ${card.title}
 Category: ${card.category}
 Description: ${card.description}
 Unit Price: ${card.price}
-Quantity Ordered: ${customerData.quantity} pieces
-💰 TOTAL AMOUNT: ₹${calculateTotal()}
+Quantity Ordered: 1 piece
+💰 TOTAL AMOUNT: ₹${card.price}
 📅 Order Date: ${new Date().toLocaleDateString()}
 
 ✨ SPECIAL REQUESTS:
@@ -156,7 +147,7 @@ ${customerData.specialRequests || 'No special requests'}
           <div className="card-info">
             <h3>{card.title}</h3>
             <p>{card.description}</p>
-            <span className="price">{card.price} each</span>
+            <span className="price">{card.price}</span>
             <span className="category">{card.category}</span>
           </div>
         </div>
@@ -215,25 +206,9 @@ ${customerData.specialRequests || 'No special requests'}
           </div>
 
           <div className="form-section">
-            <h4>Order Details</h4>
+            <h4>Special Requests (Optional)</h4>
             
             <div className="form-group">
-              <label>Quantity</label>
-              <select
-                name="quantity"
-                value={customerData.quantity}
-                onChange={handleInputChange}
-              >
-                {[...Array(50)].map((_, i) => (
-                  <option key={i + 1} value={i + 1}>
-                    {i + 1} {i === 0 ? 'piece' : 'pieces'}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label>Special Requests (Optional)</label>
               <textarea
                 name="specialRequests"
                 value={customerData.specialRequests}
@@ -241,21 +216,6 @@ ${customerData.specialRequests || 'No special requests'}
                 placeholder="Any special customizations or requests"
                 rows="3"
               />
-            </div>
-          </div>
-
-          <div className="order-summary">
-            <div className="summary-row">
-              <span>Unit Price:</span>
-              <span>{card.price}</span>
-            </div>
-            <div className="summary-row">
-              <span>Quantity:</span>
-              <span>{customerData.quantity}</span>
-            </div>
-            <div className="summary-row total">
-              <span>Total Amount:</span>
-              <span>₹{calculateTotal()}</span>
             </div>
           </div>
 

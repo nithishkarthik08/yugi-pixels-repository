@@ -416,34 +416,30 @@ h1, h2, h3, h4, h5, h6 {
   .nav {
     padding: 0 1rem;
   }
-  
   .nav-links {
     gap: 1rem;
+    display: flex !important; /* Ensure nav links are visible on mobile */
+    flex-direction: row;
+    flex-wrap: wrap;
   }
-  
-  .hero-content h1 {
-    font-size: 2.5rem;
-  }
-  
-  .hero-content p {
+  .nav-links li {
     font-size: 1rem;
   }
-  
-  .cards-grid {
-    grid-template-columns: 1fr;
+  .hero-content h1 {
+    font-size: 1.6rem; /* Decreased for mobile */
   }
-  
+  .gallery h2,
+  .about-text h2,
+  .contact h2 {
+    font-size: 1.3rem; /* Decreased for mobile */
+  }
   .about-content {
     grid-template-columns: 1fr;
     gap: 2rem;
   }
-  
-  .gallery h2,
-  .about-text h2,
-  .contact h2 {
-    font-size: 2rem;
+  .cards-grid {
+    grid-template-columns: 1fr;
   }
-  
   .container {
     padding: 0 1rem;
   }

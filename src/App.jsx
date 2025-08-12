@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react'
+import AdminPanel from './AdminPanel.jsx'
+import OrderForm from './OrderForm.jsx'
 import './App.css'
-import AdminPanel from './AdminPanel'
-import OrderForm from './OrderForm'
 
 function App() {
   const [showAdmin, setShowAdmin] = useState(false)
   const [showOrderForm, setShowOrderForm] = useState(false)
   const [selectedCard, setSelectedCard] = useState(null)
   const [weddingCards, setWeddingCards] = useState([])
+  const [zoomImage, setZoomImage] = useState(null)
 
   useEffect(() => {
     fetch('https://yugi-pixels-repository.onrender.com/api/cards')
@@ -31,6 +32,14 @@ function App() {
   const handleCloseOrderForm = () => {
     setShowOrderForm(false)
     setSelectedCard(null)
+  }
+
+  const handleZoomImage = (imgUrl) => {
+    setZoomImage(imgUrl)
+  }
+
+  const closeZoomModal = () => {
+    setZoomImage(null)
   }
 
   const handleAddCard = (newCard) => {
@@ -103,7 +112,7 @@ function App() {
           <div className="cards-grid">
             {weddingCards.map(card => (
               <div key={card.id} className="card">
-                <div className="card-image">
+                <div className="card-image" onClick={() => handleZoomImage(card.image.startsWith('/uploads/') ? `https://yugi-pixels-repository.onrender.com${card.image}` : card.image)} style={{cursor: 'zoom-in'}}>
                   <img src={card.image.startsWith('/uploads/') ? `https://yugi-pixels-repository.onrender.com${card.image}` : card.image} alt={card.title} />
                   <div className="card-overlay">
                     <span className="category">{card.category}</span>
@@ -114,12 +123,7 @@ function App() {
                   <p>{card.description}</p>
                   <div className="card-footer">
                     <span className="price">{card.price}</span>
-                    <button 
-                      className="order-btn"
-                      onClick={() => handleOrderClick(card)}
-                    >
-                      Order Now
-                    </button>
+                    <button className="order-btn" onClick={() => handleOrderClick(card)}>Order Now</button>
                   </div>
                 </div>
               </div>
@@ -177,6 +181,13 @@ function App() {
           <p>&copy; 2025 Yugi Pixels. All rights reserved.</p>
         </div>
       </footer>
+
+      {/* Image Zoom Modal */}
+      {zoomImage && (
+        <div className="zoom-modal" style={{position: 'fixed', top:0, left:0, right:0, bottom:0, background:'rgba(0,0,0,0.8)', zIndex:3000, display:'flex', alignItems:'center', justifyContent:'center'}} onClick={closeZoomModal}>
+          <img src={zoomImage} alt="Zoomed Card" style={{maxWidth:'90vw', maxHeight:'90vh', borderRadius:'20px', boxShadow:'0 8px 40px rgba(0,0,0,0.3)'}} />
+        </div>
+      )}
 
       {/* Order Form Modal */}
       {showOrderForm && selectedCard && (
