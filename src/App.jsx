@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import './App.css'
 import AdminPanel from './AdminPanel'
 import OrderForm from './OrderForm'
@@ -7,56 +7,14 @@ function App() {
   const [showAdmin, setShowAdmin] = useState(false)
   const [showOrderForm, setShowOrderForm] = useState(false)
   const [selectedCard, setSelectedCard] = useState(null)
-  const [weddingCards, setWeddingCards] = useState([
-    {
-      id: 1,
-      title: "Royal Elegance",
-      description: "Luxurious gold foil wedding invitation with intricate floral designs",
-      price: "₹299",
-      image: "https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&h=500&fit=crop",
-      category: "Premium"
-    },
-    {
-      id: 2,
-      title: "Modern Minimalist",
-      description: "Clean, contemporary design with subtle typography",
-      price: "₹199",
-      image: "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=400&h=500&fit=crop",
-      category: "Standard"
-    },
-    {
-      id: 3,
-      title: "Floral Romance",
-      description: "Romantic watercolor floral design with soft pastels",
-      price: "₹249",
-      image: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&h=500&fit=crop",
-      category: "Premium"
-    },
-    {
-      id: 4,
-      title: "Vintage Classic",
-      description: "Traditional ornate design with vintage charm",
-      price: "₹179",
-      image: "https://images.unsplash.com/photo-1464207687429-7505649dae38?w=400&h=500&fit=crop",
-      category: "Standard"
-    },
-    {
-      id: 5,
-      title: "Boho Chic",
-      description: "Bohemian style with feathers and dreamcatcher elements",
-      price: "₹229",
-      image: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=400&h=500&fit=crop",
-      category: "Premium"
-    },
-    {
-      id: 6,
-      title: "Rustic Charm",
-      description: "Kraft paper invitation with twine and natural elements",
-      price: "₹149",
-      image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=500&fit=crop",
-      category: "Budget"
-    }
-  ])
+  const [weddingCards, setWeddingCards] = useState([])
+
+  useEffect(() => {
+    fetch('http://localhost:5000/api/cards')
+      .then(res => res.json())
+      .then(data => setWeddingCards(data))
+      .catch(() => setWeddingCards([]))
+  }, [])
 
   const scrollToGallery = () => {
     const gallerySection = document.getElementById('gallery');
@@ -129,7 +87,7 @@ function App() {
       </header>
 
       {/* Hero Section */}
-      <section id="home" className="hero">
+      <section className="hero" style={{ background: '#FFDBCC' }}>
         <div className="hero-content">
           <h1>Beautiful Wedding Invitations</h1>
           <p>Create unforgettable first impressions with our stunning collection of wedding invitations</p>
@@ -142,12 +100,11 @@ function App() {
         <div className="container">
           <h2>Our Wedding Card Collection</h2>
           <p className="section-subtitle">Choose from our carefully curated selection of elegant wedding invitations</p>
-          
           <div className="cards-grid">
             {weddingCards.map(card => (
               <div key={card.id} className="card">
                 <div className="card-image">
-                  <img src={card.image} alt={card.title} />
+                  <img src={card.image.startsWith('/uploads/') ? `http://localhost:5000${card.image}` : card.image} alt={card.title} />
                   <div className="card-overlay">
                     <span className="category">{card.category}</span>
                   </div>
@@ -200,15 +157,15 @@ function App() {
           <div className="contact-info">
             <div className="contact-item">
               <h3>📞 Phone</h3>
-              <p>+91 98765 43210</p>
+              <p>6369149990</p>
             </div>
             <div className="contact-item">
               <h3>✉️ Email</h3>
-              <p>hello@yugipixels.com</p>
+              <p>yugipixels@gmail.com</p>
             </div>
             <div className="contact-item">
               <h3>📍 Address</h3>
-              <p>123 Wedding Street, Mumbai, India</p>
+              <p>Palani, Tamil Nadu</p>
             </div>
           </div>
         </div>

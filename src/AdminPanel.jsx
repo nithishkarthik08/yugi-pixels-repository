@@ -13,6 +13,9 @@ const AdminPanel = ({ cards, onAddCard, onRemoveCard, onUpdateCard, onBackToWebs
     image: '',
     category: 'Standard'
   })
+  const [aboutInfo, setAboutInfo] = useState({ text: '', image: '' })
+  const [showEditAbout, setShowEditAbout] = useState(false)
+  const [aboutForm, setAboutForm] = useState({ text: '', image: '' })
 
   // Admin credentials (in a real app, this would be more secure)
   const ADMIN_CREDENTIALS = {
@@ -37,14 +40,22 @@ const AdminPanel = ({ cards, onAddCard, onRemoveCard, onUpdateCard, onBackToWebs
     setEditingCard(null)
   }
 
-  const handleAddCard = (e) => {
+  // Add card to backend
+  const handleAddCard = async (e) => {
     e.preventDefault()
     if (newCard.title && newCard.description && newCard.price && newCard.image) {
       const cardToAdd = {
         ...newCard,
-        id: Date.now(), // Simple ID generation
+        id: Date.now(),
       }
-      onAddCard(cardToAdd)
+      // Send to backend
+      const res = await fetch('http://localhost:5000/api/cards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cardToAdd)
+      })
+      const savedCard = await res.json()
+      onAddCard(savedCard)
       setNewCard({
         title: '',
         description: '',
@@ -94,6 +105,50 @@ const AdminPanel = ({ cards, onAddCard, onRemoveCard, onUpdateCard, onBackToWebs
       image: '',
       category: 'Standard'
     })
+  }
+
+  // Remove card from backend
+  const handleRemoveCard = async (cardId) => {
+    // Remove from backend
+    const updatedCards = cards.filter(card => card.id !== cardId)
+    // Save updated list to backend
+    await fetch('http://localhost:5000/api/cards', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedCards)
+    })
+    onRemoveCard(cardId)
+  }
+
+  // Fetch about info on admin login
+  React.useEffect(() => {
+    if (isLoggedIn) {
+      fetch('http://localhost:5000/api/about')
+        .then(res => res.json())
+        .then(data => {
+          setAboutInfo(data)
+          setAboutForm(data)
+        })
+    }
+  }, [isLoggedIn])
+
+  // Edit About form submit
+  const handleAboutSubmit = async (e) => {
+    e.preventDefault()
+    let formData = new FormData()
+    formData.append('text', aboutForm.text)
+    if (aboutForm.image && typeof aboutForm.image !== 'string') {
+      formData.append('image', aboutForm.image)
+    } else if (aboutForm.image) {
+      formData.append('image', aboutForm.image)
+    }
+    const res = await fetch('http://localhost:5000/api/about', {
+      method: 'POST',
+      body: formData
+    })
+    const data = await res.json()
+    setAboutInfo(data)
+    setShowEditAbout(false)
   }
 
   if (!isLoggedIn) {
@@ -146,6 +201,14 @@ const AdminPanel = ({ cards, onAddCard, onRemoveCard, onUpdateCard, onBackToWebs
         >
           Add New Invitation
         </button>
+        <button
+          onClick={() => setShowEditAbout(true)}
+          className="add-btn"
+          style={{ background: '#4169E1', marginLeft: '1rem' }}
+          disabled={showEditAbout}
+        >
+          Edit About Section
+        </button>
       </div>
 
       {(showAddForm || editingCard) && (
@@ -182,14 +245,28 @@ const AdminPanel = ({ cards, onAddCard, onRemoveCard, onUpdateCard, onBackToWebs
               />
             </div>
             <div className="form-group">
-              <label>Image URL:</label>
+              <label>Image:</label>
               <input
-                type="url"
-                value={newCard.image}
-                onChange={(e) => setNewCard({...newCard, image: e.target.value})}
-                placeholder="https://example.com/image.jpg"
-                required
+                type="file"
+                accept="image/*"
+                onChange={async e => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    const formData = new FormData();
+                    formData.append('image', file);
+                    const res = await fetch('http://localhost:5000/api/upload', {
+                      method: 'POST',
+                      body: formData
+                    });
+                    const data = await res.json();
+                    setNewCard({...newCard, image: data.imageUrl});
+                  }
+                }}
+                required={!editingCard}
               />
+              {newCard.image && (
+                <img src={newCard.image} alt="Preview" style={{maxWidth: '120px', marginTop: '1rem', borderRadius: '8px'}} />
+              )}
             </div>
             <div className="form-group">
               <label>Category:</label>
@@ -209,6 +286,40 @@ const AdminPanel = ({ cards, onAddCard, onRemoveCard, onUpdateCard, onBackToWebs
               <button type="button" onClick={cancelEdit} className="cancel-btn">
                 Cancel
               </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {showEditAbout && (
+        <div className="card-form">
+          <h3>Edit About Section</h3>
+          <form onSubmit={handleAboutSubmit}>
+            <div className="form-group">
+              <label>About Text:</label>
+              <textarea
+                value={aboutForm.text}
+                onChange={e => setAboutForm({ ...aboutForm, text: e.target.value })}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>About Image:</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={e => {
+                  const file = e.target.files[0]
+                  if (file) setAboutForm({ ...aboutForm, image: file })
+                }}
+              />
+              {aboutInfo.image && (
+                <img src={aboutInfo.image.startsWith('/uploads/') ? `http://localhost:5000${aboutInfo.image}` : aboutInfo.image} alt="About Preview" style={{maxWidth: '120px', marginTop: '1rem', borderRadius: '8px'}} />
+              )}
+            </div>
+            <div className="form-actions">
+              <button type="submit" className="save-btn">Save</button>
+              <button type="button" onClick={() => setShowEditAbout(false)} className="cancel-btn">Cancel</button>
             </div>
           </form>
         </div>
@@ -236,7 +347,7 @@ const AdminPanel = ({ cards, onAddCard, onRemoveCard, onUpdateCard, onBackToWebs
                     Edit
                   </button>
                   <button 
-                    onClick={() => onRemoveCard(card.id)} 
+                    onClick={() => handleRemoveCard(card.id)} 
                     className="remove-btn"
                     disabled={editingCard || showAddForm}
                   >
